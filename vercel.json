@@ -2,8 +2,10 @@
     "rewrites": [
         { "source": "/(.*)", "destination": "/index.html" }
     ],
-    "static": {
-        "source": "/static/(.*)",
-        "destination": "/static/$1"
-    }
+    "routes": [
+        {
+            "src": "/static/(.*)",
+            "dest": "/static/$1"
+        }
+    ]
 }
