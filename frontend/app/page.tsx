@@ -7,10 +7,13 @@ import TickerSelector from '../components/TickerSelector'
 import { fetchMetadata } from '../utils/dataFormatter'
 import { handleError } from '../utils/errorHandler'
 import { availableTickers } from '../config/tickers'
+import ErrorNotification from '../components/ErrorNotification' // Import the ErrorNotification component
 
 export default function Home() {
   const [metadata, setMetadata] = useState<any>(null)
   const [selectedTickers, setSelectedTickers] = useState<string[]>([])
+  const [loading, setLoading] = useState<boolean>(true) // Loading state
+  const [errorMessage, setErrorMessage] = useState<string | null>(null) // Error message state
 
   useEffect(() => {
     const getMetadata = async () => {
@@ -19,6 +22,9 @@ export default function Home() {
         setMetadata(data)
       } catch (error) {
         handleError(error)
+        setErrorMessage(error.message) // Set error message on failure
+      } finally {
+        setLoading(false) // Set loading to false after fetching
       }
     }
 
@@ -32,13 +38,19 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-8">Stock Dashboard</h1>
-      <TickerSelector
-        tickers={availableTickers}
-        selectedTickers={selectedTickers}
-        onTickerChange={handleTickerChange}
-      />
-      <Dashboard selectedTickers={selectedTickers} />
+      {errorMessage && <ErrorNotification message={errorMessage} />} {/* Display error notification */}
+      {loading ? ( // Conditional rendering based on loading state
+        <p>Loading metadata...</p>
+      ) : (
+        <>
+          <TickerSelector
+            tickers={availableTickers}
+            selectedTickers={selectedTickers}
+            onTickerChange={handleTickerChange}
+          />
+          <Dashboard selectedTickers={selectedTickers} />
+        </>
+      )}
     </div>
   )
 }
-
